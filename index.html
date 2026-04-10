@@ -176,29 +176,29 @@
 <h2 class="text-3xl font-bold mb-2" style="">Únete a la comunidad</h2>
 <p class="text-on-surface-variant" style="">Regístrate y comienza a transformar el agro hoy mismo.</p>
 </div>
-<form class="space-y-6">
+<form id="registro-form" class="space-y-6">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div>
 <label class="block text-sm font-bold mb-2 text-on-surface-variant" style="">Nombre Completo</label>
-<input class="w-full px-4 py-3 rounded-lg bg-surface border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary transition-all" placeholder="Ej. Juan Pérez" type="text">
+<input id="nombre" class="w-full px-4 py-3 rounded-lg bg-surface border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary transition-all" placeholder="Ej. Juan Pérez" type="text" required>
 </div>
 <div>
 <label class="block text-sm font-bold mb-2 text-on-surface-variant" style="">Correo Electrónico</label>
-<input class="w-full px-4 py-3 rounded-lg bg-surface border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary transition-all" placeholder="email@ejemplo.com" type="email">
+<input id="email" class="w-full px-4 py-3 rounded-lg bg-surface border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary transition-all" placeholder="email@ejemplo.com" type="email" required>
 </div>
 </div>
 <div>
 <label class="block text-sm font-bold mb-2 text-on-surface-variant" style="">Tipo de Usuario</label>
 <div class="grid grid-cols-2 gap-4">
 <label class="relative flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer hover:bg-primary-container/10 transition-colors border-outline-variant has-[:checked]:border-primary has-[:checked]:bg-primary-container/20" style="">
-<input class="sr-only" name="user_type" type="radio" value="producer">
+<input class="sr-only" name="user_type" type="radio" value="productor" required>
 <div class="flex flex-col items-center gap-1">
 <span class="material-symbols-outlined" style="">agriculture</span>
 <span class="text-sm font-bold" style="">Productor</span>
 </div>
 </label>
 <label class="relative flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer hover:bg-primary-container/10 transition-colors border-outline-variant has-[:checked]:border-primary has-[:checked]:bg-primary-container/20" style="">
-<input class="sr-only" name="user_type" type="radio" value="seller">
+<input class="sr-only" name="user_type" type="radio" value="vendedor" required>
 <div class="flex flex-col items-center gap-1">
 <span class="material-symbols-outlined" style="">storefront</span>
 <span class="text-sm font-bold" style="">Vendedor</span>
@@ -210,7 +210,7 @@
 <label class="block text-sm font-bold mb-2 text-on-surface-variant" style="">Contraseña</label>
 <input class="w-full px-4 py-3 rounded-lg bg-surface border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary transition-all" placeholder="••••••••" type="password">
 </div>
-<button class="w-full bg-primary text-on-primary py-4 rounded-xl font-bold text-lg shadow-md hover:shadow-lg active:scale-95 transition-all" type="submit" style="">
+<button id="submit-btn" class="w-full bg-primary text-on-primary py-4 rounded-xl font-bold text-lg shadow-md hover:shadow-lg active:scale-95 transition-all" type="submit" style="">
                             Crear mi Cuenta
                         </button>
 </form>
@@ -281,4 +281,51 @@
 </button>
 </div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Inicializamos Supabase para el navegador
+  const supabaseUrl = "https://ysaivzotchbdjcxxgdyw.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzYWl2em90Y2hiZGpjeHhnZHl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTIyNDYsImV4cCI6MjA5MTM4ODI0Nn0.LvqpzI0GppQ2H1NTwLRVnSShHbq67dpPFpWSo4YyLmQ";
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  // Funcionalidad para el formulario
+  document.getElementById('registro-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Evita que la página se recargue
+    const btn = document.getElementById('submit-btn');
+    const originalText = btn.innerText;
+    btn.innerText = "Registrando...";
+    btn.disabled = true;
+
+    // Obtener valores del formulario
+    const nombre = document.getElementById('nombre').value;
+    const email = document.getElementById('email').value;
+    const rol = document.querySelector('input[name="user_type"]:checked')?.value;
+
+    try {
+      // Mandar la info a Supabase usando un Insert a la tabla 'usuarios'
+      const { data, error } = await supabase
+        .from('usuarios')
+        .insert([
+          { nombre_completo: nombre, email: email, rol: rol }
+        ]);
+        
+      if (error) throw error;
+      
+      alert("¡Cuenta creada con éxito! Se han guardado tus datos en Supabase.");
+      document.getElementById('registro-form').reset();
+    } catch (error) {
+      console.error(error);
+      
+      // Manejar error si el correo ya existe
+      if (error.code === '23505') {
+          alert("Error: Ese correo electrónico ya está registrado en el sistema.");
+      } else {
+          alert("Hubo un error al registrar: " + error.message);
+      }
+    } finally {
+      btn.innerText = originalText;
+      btn.disabled = false;
+    }
+  });
+</script>
 </body></html>
