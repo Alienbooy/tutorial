@@ -281,12 +281,13 @@
 </button>
 </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
   // Inicializamos Supabase para el navegador
   const supabaseUrl = "https://ysaivzotchbdjcxxgdyw.supabase.co";
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzYWl2em90Y2hiZGpjeHhnZHl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTIyNDYsImV4cCI6MjA5MTM4ODI0Nn0.LvqpzI0GppQ2H1NTwLRVnSShHbq67dpPFpWSo4YyLmQ";
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   // Funcionalidad para el formulario
   document.getElementById('registro-form').addEventListener('submit', async (e) => {
